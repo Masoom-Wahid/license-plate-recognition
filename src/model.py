@@ -3,7 +3,7 @@ import uuid
 import cv2
 
 
-model = YOLO("/home/ahmadsohailraoufi/Desktop/dev/python/fastapi/license-plate/src/model/best.pt")
+model = YOLO("src/model/best.pt")
 
 
 def predict_and_save(img):
