@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Video Processing with YOLO</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      progress {
+        width: 100%;
+        height: 30px;
+      }
+      video {
+        width: 100%;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Upload and Process Video</h1>
+    <input type="file" id="videoInput" accept="video/*" />
+    <button onclick="uploadVideo()">Upload & Process</button>
+
+    <h3>Progress:</h3>
+    <progress id="progressBar" value="0" max="100"></progress>
+    <span id="progressText">0%</span>
+
+    <video id="processedVideo" controls></video>
+
+    <script>
+      function uploadVideo() {
+        const fileInput = document.getElementById('videoInput');
+        if (fileInput.files.length === 0) {
+          alert('Please select a video file');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        fetch('/process-video', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(() => {
+            listenProgress();
+          })
+          .catch((err) => {
+            console.error(err);
+            alert('Upload failed');
+          });
+      }
+
+      function listenProgress() {
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        const eventSource = new EventSource('/progress');
+        eventSource.onmessage = function (event) {
+          const prog = parseInt(event.data);
+          progressBar.value = prog;
+          progressText.textContent = prog + '%';
+
+          if (prog >= 100) {
+            eventSource.close();
+            loadProcessedVideo();
+          }
+        };
+      }
+
+      function loadProcessedVideo() {
+        const video = document.getElementById('processedVideo');
+        video.src = '/output-video';
+        video.load();
+        video.play();
+      }
+    </script>
+  </body>
+</html>
