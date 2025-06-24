@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>YOLOv8 License Plate Detection</title>
+  </head>
+  <body>
+    <h1>Upload an image for prediction</h1>
+    <form action="/predict" method="post" enctype="multipart/form-data">
+      <input type="file" name="file" accept="image/*" required />
+      <button type="submit">Upload & Predict</button>
+    </form>
+
+    {% if result_image %}
+    <h2>Result:</h2>
+    <img
+      src="{{ result_image }}"
+      alt="Prediction result"
+      style="max-width: 100%"
+    />
+    {% endif %}
+  </body>
+</html>
