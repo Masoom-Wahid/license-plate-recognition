@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image Prediction</title>
+    <link rel="stylesheet" href="/static/styles/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Predict an Image</h1>
+      <div class="card">
+        <form method="post" action="/predict" enctype="multipart/form-data">
+          <input type="file" name="file" accept="image/*" required />
+          <br />
+          <button class="btn" type="submit">Upload & Predict</button>
+        </form>
+        {% if result_image %}
+        <h3>Result:</h3>
+        <img
+          src="{{ result_image }}"
+          alt="Predicted image"
+          style="max-width: 100%; margin-top: 1rem"
+        />
+        {% endif %}
+      </div>
+      <a href="/" class="btn">← Back to Home</a>
+    </div>
+  </body>
+</html>

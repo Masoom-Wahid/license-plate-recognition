@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>YOLOv8 License Plate Detection</title>
+    <meta charset="UTF-8" />
+    <title>YOLO Inference</title>
+    <link rel="stylesheet" href="/static/styles/styles.css" />
   </head>
   <body>
-    <h1>Upload an image for prediction</h1>
-    <form action="/predict" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" accept="image/*" required />
-      <button type="submit">Upload & Predict</button>
-    </form>
-
-    {% if result_image %}
-    <h2>Result:</h2>
-    <img
-      src="{{ result_image }}"
-      alt="Prediction result"
-      style="max-width: 100%"
-    />
-    {% endif %}
+    <div class="container">
+      <h1>Welcome to YOLO Inference</h1>
+      <p>
+        This app uses a trained YOLO model to detect objects in images and
+        videos. Choose an option below to get started.
+      </p>
+      <div style="margin-top: 2rem">
+        <a href="/image" class="btn">Predict Image</a>
+        <a href="/video" class="btn">Process Video</a>
+      </div>
+    </div>
   </body>
 </html>

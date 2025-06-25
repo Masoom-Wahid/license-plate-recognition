@@ -2,34 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Video Processing with YOLO</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        padding: 20px;
-      }
-      progress {
-        width: 100%;
-        height: 30px;
-      }
-      video {
-        width: 100%;
-        margin-top: 20px;
-      }
-    </style>
+    <title>Video Processing</title>
+    <link rel="stylesheet" href="/static/styles/styles.css" />
   </head>
   <body>
-    <h1>Upload and Process Video</h1>
-    <input type="file" id="videoInput" accept="video/*" />
-    <button onclick="uploadVideo()">Upload & Process</button>
+    <div class="container">
+      <h1>Process a Video</h1>
+      <div class="card">
+        <input type="file" id="videoInput" accept="video/*" />
+        <br />
+        <button class="btn" onclick="uploadVideo()">Upload & Process</button>
 
-    <h3>Progress:</h3>
-    <progress id="progressBar" value="0" max="100"></progress>
-    <span id="progressText">0%</span>
+        <progress id="progressBar" value="0" max="100"></progress>
+        <span id="progressText">0%</span>
 
-    <video id="processedVideo" controls></video>
+        <br />
+        <a id="downloadLink" href="#" class="btn" style="display: none" download
+          >Download Processed Video</a
+        >
+      </div>
+      <a href="/" class="btn">← Back to Home</a>
+    </div>
 
     <script>
+      let jobId = null;
+
       function uploadVideo() {
         const fileInput = document.getElementById('videoInput');
         if (fileInput.files.length === 0) {
@@ -44,8 +41,11 @@
           method: 'POST',
           body: formData,
         })
-          .then(() => {
-            listenProgress();
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data.job_id) throw new Error('No job ID returned');
+            jobId = data.job_id;
+            listenProgress(jobId);
           })
           .catch((err) => {
             console.error(err);
@@ -53,11 +53,12 @@
           });
       }
 
-      function listenProgress() {
+      function listenProgress(jobId) {
         const progressBar = document.getElementById('progressBar');
         const progressText = document.getElementById('progressText');
+        const downloadLink = document.getElementById('downloadLink');
 
-        const eventSource = new EventSource('/progress');
+        const eventSource = new EventSource(`/progress/${jobId}`);
         eventSource.onmessage = function (event) {
           const prog = parseInt(event.data);
           progressBar.value = prog;
@@ -65,16 +66,15 @@
 
           if (prog >= 100) {
             eventSource.close();
-            loadProcessedVideo();
+            downloadLink.href = `/output-video/${jobId}`;
+            downloadLink.style.display = 'inline-block';
           }
         };
-      }
 
-      function loadProcessedVideo() {
-        const video = document.getElementById('processedVideo');
-        video.src = '/output-video';
-        video.load();
-        video.play();
+        eventSource.onerror = function () {
+          console.error('SSE error occurred');
+          eventSource.close();
+        };
       }
     </script>
   </body>
